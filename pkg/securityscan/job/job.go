@@ -86,7 +86,6 @@ func New(clusterscan *operatorapiv1.ClusterScan, clusterscanprofile *operatorapi
 				},
 				Spec: corev1.PodSpec{
 					HostPID:                       true,
-					HostIPC:                       true,
 					ServiceAccountName:            operatorapiv1.ClusterScanSA,
 					TerminationGracePeriodSeconds: &TerminationGracePeriodSeconds,
 					Tolerations:                   tolerations,

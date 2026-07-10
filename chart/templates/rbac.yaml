@@ -24,8 +24,6 @@ rules:
   - "pods"
   - "services"
   - "configmaps"
-  - "nodes"
-  - "serviceaccounts"
   verbs:
   - "get"
   - "list"
@@ -33,6 +31,14 @@ rules:
   - "update"
   - "watch"
   - "patch"
+- apiGroups:
+  - ""
+  resources:
+  - "nodes"
+  verbs:
+  - "get"
+  - "list"
+  - "watch"
 - apiGroups:
   - "rbac.authorization.k8s.io"
   resources:
@@ -148,9 +154,27 @@ rules:
   resources:
   - "configmaps"
   - "pods"
-  - "secrets"
   verbs:
   - "*"
+- apiGroups:
+  - ""
+  resources:
+  - "serviceaccounts"
+  verbs:
+  - "get"
+  - "patch"
+# Sonobuoy creates a per-scan TLS secret for aggregator<->plugin mTLS,
+# running as the scan SA. Scoped to create+delete only (no get/list/watch):
+# it creates the secret under a name it already knows and deletes that same
+# name on cleanup, so it never needs to read or enumerate secrets. This is
+# strictly tighter than the previous wildcard and blocks secret exfiltration.
+- apiGroups:
+  - ""
+  resources:
+  - "secrets"
+  verbs:
+  - "create"
+  - "delete"
 - apiGroups:
   - "apps"
   resources:

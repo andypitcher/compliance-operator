@@ -11,7 +11,6 @@ data:
     podSpec:
       containers: []
       dnsPolicy: ClusterFirstWithHostNet
-      hostIPC: true
       hostNetwork: true
       hostPID: true
       serviceAccountName: {{ .serviceaccount }}
@@ -111,7 +110,20 @@ data:
       {{- end }}
       imagePullPolicy: IfNotPresent
       securityContext:
-        privileged: true
+        #   DAC_READ_SEARCH - read root-owned 0600 config/PKI files
+        #   SYS_PTRACE      - read /proc/<pid>/cmdline of host processes
+        #   SYS_CHROOT      - chroot into /node
+        privileged: false
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop:
+          - ALL
+          add:
+          - DAC_READ_SEARCH
+          - SYS_PTRACE
+          - SYS_CHROOT
+        seccompProfile:
+          type: RuntimeDefault
       volumeMounts:
       - mountPath: /tmp/results
         name: results

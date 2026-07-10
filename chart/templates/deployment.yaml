@@ -20,6 +20,20 @@ spec:
       - name: compliance-operator
         image: '{{ template "system_default_registry" . }}{{ .Values.image.operator.repository }}:{{ .Values.image.operator.tag }}'
         imagePullPolicy: IfNotPresent
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 65534
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+            - ALL
+          seccompProfile:
+            type: RuntimeDefault
+          {{- if .Values.global.seLinux.enabled }}
+          seLinuxOptions:
+            type: rancher_compliance_operator_container_t
+          {{- end }}
         ports:
         - name: metrics
           containerPort: {{ .Values.alerts.metricsPort }}
